@@ -44,7 +44,7 @@ func handleRequest(conn net.Conn){
 	// Read the incoming connection into buffer
 	reqLen, err := conn.Read(buf)
 	_ = reqLen
-//	fmt.Println(buf[:reqLen])
+	fmt.Println(buf[:reqLen])
 	//bgpLen := buf[17]
 	bgpType := buf[18]
 	bgpVersion := buf[19]
@@ -53,11 +53,18 @@ func handleRequest(conn net.Conn){
 	bgpNeighborID := strconv.Itoa(int(buf[24]))+"."+strconv.Itoa(int(buf[25]))+"."+strconv.Itoa(int(buf[26]))+"."+strconv.Itoa(int(buf[27]))
 	if(bgpType==1) {
 		fmt.Println("BGP OPEN Message received. NeighborID " + string(bgpNeighborID) + " Type: " + strconv.Itoa(int(bgpType)) + ", BGP Version: " + strconv.Itoa(int(bgpVersion)) + ",ASN: " + strconv.Itoa(int(bgpAS)))
+		buf[18] = 4
+		buf[24] = 10
+		buf[25] = 0
+		buf[26] = 1
+		buf[27] = 100
+		conn.Write(buf)
+		fmt.Println(buf)
 	}
 	if err != nil {
 		fmt.Println("Error Reading:",err.Error())
 	}
-	// conn.Write([]byte("Recieved"))
+
 	conn.Close()
 }
 
